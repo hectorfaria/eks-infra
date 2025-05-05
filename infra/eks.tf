@@ -56,3 +56,16 @@ resource "aws_eks_node_group" "general" {
     aws_iam_role_policy_attachment.nodes-AmazonEC2ContainerRegistryReadOnly
   ]
 }
+
+resource "aws_eks_addon" "pod_identity" {
+  cluster_name  = aws_eks_cluster.eks.name
+  addon_name    = "eks-pod-identity-agent"
+  addon_version = "v1.3.5-eksbuild.2"
+}
+
+resource "aws_eks_pod_identity_association" "cluster_autoscaler" {
+  cluster_name    = aws_eks_cluster.eks.name
+  namespace       = "kube-system"
+  service_account = "cluster-autoscaler"
+  role_arn        = aws_iam_role.cluster_autoscaler.arn
+}
